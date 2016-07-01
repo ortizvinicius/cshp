@@ -12,15 +12,16 @@ class Cshp_OutputObject {
   }
 
   public function addString($string = ""){
-    array_push($outputArray, $string);
+    array_push($this->outputArray, $string);
   }
 
   public function addStringAtBeginning($string = ""){
-    array_unshift($outputArray, $string);
+    array_unshift($this->outputArray, $string);
   }
 
   public function addSelector(Cshp_Selector $selector){
-    //When a nested or a selector == existent, look for the selector and update it
+    array_push($this->outputArray, $selector);
+    print_r($this->outputArray);
   }
 
   

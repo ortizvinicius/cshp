@@ -1,0 +1,7 @@
+{
+  "text-decoration:underline": "tdu",
+  "text-decoration:none": "tdn",
+  "text-decoration:overline": "tdo",
+  "text-decoration:line-through": "tdl",
+  "border:none": "bdn"
+}
