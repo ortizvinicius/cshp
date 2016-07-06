@@ -53,26 +53,20 @@ class Cshp {
 
   public function import($file, $options = []){
     try {
+      
+      $importString = "@import '" . $file . "' ";
+      $optionsSize = sizeof($options);
 
-      if(strpos($file, ".php") !== false){ //Import the content of php file (compile together)
-        //TO DO
-      } else { //Creates a simple CSS import
-
-        $importString = "@import '" . $file . "' ";
-        $optionsSize = sizeof($options);
-
-        if($optionsSize > 0){
-          foreach($options as $opI => $option){
-            $importString .= $option;
-            if($opI < $optionsSize-1){
-              $importString .= ", ";
-            }
+      if($optionsSize > 0){
+        foreach($options as $opI => $option){
+          $importString .= $option;
+          if($opI < $optionsSize-1){
+            $importString .= ", ";
           }
         }
-
-        $this->outputObject->addStringAtBeginning($importString);
-
       }
+
+      $this->outputObject->addStringAtBeginning($importString);
 
     } catch (Exception $error){
       $this->throwError($error->getMessage());
@@ -86,16 +80,13 @@ class Cshp {
       $selectorObj->mainSelector = $selector;
       $selectorObj->properties = $properties;
 
-      $selectorSnippets = array_intersect($this->snippets, $properties);
+      $selectorSnippets = array_intersect($properties, array_flip($this->snippets));
       
       foreach ($selectorSnippets as $selectorSnippetKey => $selectorSnippetValue) {
-        $newPropertie = explode(":", $selectorSnippetKey);
-        $propertieKey = array_search($selectorSnippetValue, $selectorObj->properties);
-
-        $selectorObj->properties[$propertieKey] = $newPropertie[1];
-        $selectorObj->properties[$newPropertie[0]] = $selectorObj->properties[$propertieKey];
-        
-        unset($selectorObj->properties[$propertieKey]);
+        $newPropertie = explode(":", $this->snippets[$selectorSnippetValue]);
+        $selectorObj->properties[$selectorSnippetKey] = $newPropertie[1];
+        $selectorObj->properties[$newPropertie[0]] = $selectorObj->properties[$selectorSnippetKey];
+        unset($selectorObj->properties[$selectorSnippetKey]);
       }
 
       $this->outputObject->addSelector($selectorObj);
