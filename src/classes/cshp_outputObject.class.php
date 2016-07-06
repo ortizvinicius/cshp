@@ -28,6 +28,8 @@ class Cshp_OutputObject {
 
     foreach ($mainSelectors as $mainSelector) { 
 
+      $mainSelector = trim($mainSelector);
+
       $existentIndex = array_search($mainSelector, $this->indexArray);
 
       if($existentIndex === false){
