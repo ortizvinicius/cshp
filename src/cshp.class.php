@@ -32,12 +32,12 @@ class Cshp {
     }
   }
 
-  private function throwError($errorMessage){
+  private function throwError($errorMessage){ //Clear all the css and shows an error in a comment
     $this->outputObject->erase();
     $this->comment("error", $errorMessage);
   }
 
-  public function comment($type = "info", $message = "Ops! We forget the message"){
+  public function comment($type = "info", $message = "Ops! We forget the message"){ //CSS comment
     $commentString = "";
     
     if($type == "info"){
@@ -51,7 +51,7 @@ class Cshp {
     $this->outputObject->addString($commentString);
   }
 
-  public function import($file, $options = []){
+  public function import($file, $options = []){ //Add a import at the begining of the CSS file
     try {
       
       $importString = "@import '" . $file . "' ";
@@ -73,9 +73,27 @@ class Cshp {
     }
   }
 
-  public function select($selector, $properties = [], $functions = []){
+  public function select($selector, $properties = [], $functions = []){ //The main function
     try {
       
+      foreach ($properties as $propertie => $attribute) {
+        if(gettype($attribute) == "array"){
+          
+          $mod = substr($propertie, 0, 1);
+          $propName = substr($propertie, 1);
+
+          if($mod == "&"){ //Pseudo-classes
+            $this->select($selector.":".$propName, $attribute);
+          } else if($mod == "%"){ //Nested properties
+            foreach ($attribute as $attributeKey => $attributeValue) {
+              $properties[$propName."-".$attributeKey] = $attributeValue;
+            }
+          }
+
+          unset($properties[$propertie]);
+        }
+      }
+
       $selectorObj = new Cshp_Selector();
       $selectorObj->mainSelector = $selector;
       $selectorObj->properties = $properties;

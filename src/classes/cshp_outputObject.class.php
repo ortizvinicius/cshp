@@ -24,24 +24,16 @@ class Cshp_OutputObject {
 
   public function addSelector(Cshp_Selector $selector){
 
-    $mainSelectors = explode(",", $selector->mainSelector);
+    $existentIndex = array_search($selector->mainSelector, $this->indexArray);
 
-    foreach ($mainSelectors as $mainSelector) { 
-
-      $mainSelector = trim($mainSelector);
-
-      $existentIndex = array_search($mainSelector, $this->indexArray);
-
-      if($existentIndex === false){
-        $selector->mainSelector = $mainSelector;
-        array_push($this->outputArray, $selector);
-        array_push($this->indexArray, $mainSelector);
-      } else {
-        //Add the new properties
-        $this->outputArray[$existentIndex]->properties = array_merge($this->outputArray[$existentIndex]->properties, $selector->properties);
-      }
-
+    if($existentIndex === false){
+      array_push($this->outputArray, $selector);
+      array_push($this->indexArray, $selector->mainSelector);
+    } else {
+      //Add the new properties
+      $this->outputArray[$existentIndex]->properties = array_merge($this->outputArray[$existentIndex]->properties, $selector->properties);
     }
+
 
     print_r($this->outputArray);
   }
