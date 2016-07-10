@@ -10,6 +10,8 @@ class Cshp_OutputObject {
   private $indexArray = [];
 
   public function erase(){
+    $this->outputArray = [];
+    $this->indexArray = [];
   }
 
   public function addString($string = ""){
@@ -34,11 +36,37 @@ class Cshp_OutputObject {
       $this->outputArray[$existentIndex]->properties = array_merge($this->outputArray[$existentIndex]->properties, $selector->properties);
     }
 
-
-    print_r($this->outputArray);
   }
 
-  
+  public function compile($compress = false){
+    $outputCSS = "";
+
+    $lineBreak = !$compress ? "\n" : "";
+    $space = !$compress ? " " : "";
+    $ident = !$compress ? "  " : "";
+
+    $lastString = false;
+
+    foreach ($this->outputArray as $selector) {
+      if(gettype($selector) == "object"){
+        if($lastString){ $outputCSS .= $lineBreak; }
+        
+        $outputCSS .= $selector->mainSelector . $space . "{" . $lineBreak;
+        foreach ($selector->properties as $propKey => $propValue) {
+          $outputCSS .= $ident.$propKey . ':' . $space . $propValue . ";" . $lineBreak;
+        }
+        $outputCSS .= "}".$lineBreak;
+        
+        $lastString = false;
+      } else {
+        if(!$lastString){ $outputCSS .= $lineBreak; }
+        $outputCSS .= $selector.$lineBreak;
+        $lastString = true;
+      }
+    }
+
+    return $outputCSS;
+  }
 
 }
 
