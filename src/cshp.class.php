@@ -72,6 +72,8 @@ class Cshp {
   public function select($selector, $properties = [], $functions = []){ //The main function
     try {
       
+      $pseudoClasses = [];
+
       foreach ($properties as $propertie => $propValue) {
         if(gettype($propValue) == "array"){
           
@@ -79,7 +81,10 @@ class Cshp {
           $propName = substr($propertie, 1);
 
           if($mod == "&"){ //Pseudo-classes
-            $this->select($selector.":".$propName, $propValue);
+            array_push($pseudoClasses, [
+              "selector" => $selector.":".$propName, 
+              "properties" => $propValue
+            ]);
           } else if($mod == "%"){ //Nested properties
             foreach ($propValue as $propValueKey => $propValueVal) {
               $properties[$propName."-".$propValueKey] = $propValueVal;
@@ -104,6 +109,10 @@ class Cshp {
       }
 
       $this->outputObject->addSelector($selectorObj);
+
+      foreach ($pseudoClasses as $pseudoSelector) {
+        $this->select($pseudoSelector["selector"], $pseudoSelector["properties"]);
+      }
 
     } catch (Exception $error) {
       $this->throwError($error->getMessage());
