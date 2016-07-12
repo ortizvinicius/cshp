@@ -1,7 +1,7 @@
 <?php 
 
 require_once("classes/cshp_OutputObject.class.php");
-require_once("classes/cshp_Selector.class.php");
+require_once("classes/cshp_Ruleset.class.php");
 
 class Cshp {
 
@@ -18,14 +18,18 @@ class Cshp {
   function __construct($options = [], $cshpFolder = "src"){
     
     $this->outputObject = new Cshp_OutputObject();
-    $this->cshpFolder = is_array($options) ? $cshpFolder : $options;
+    $this->cshpFolder = is_array($options) ? $cshpFolder : $options; //If an array was not given in options, so it is the folder name
 
     try { 
       $this->compress = in_array("compress", $options) || in_array("compressed", $options); //True = compress, False = normal  
-      $this->snippets = json_decode(file_get_contents($this->cshpFolder."/data/cshp_snippets.json"), true);
+      $this->snippets = in_array("snippets", $options) ? json_decode(file_get_contents($this->cshpFolder."/data/cshp_snippets.json"), true) : array();
     } catch (Exception $error){
       $this->throwError($error->getMessage());
     }
+  }
+
+  public function text($text){ //Other contents
+    $this->outputObject->addString($text);
   }
 
   private function throwError($errorMessage){ //Clear all the css and shows an error in a comment
@@ -69,49 +73,52 @@ class Cshp {
     }
   }
 
-  public function select($selector, $properties = [], $functions = []){ //The main function
+  public function rule($selector, $declarations = [], $functions = []){ //CSS declaration
     try {
       
-      $pseudoClasses = [];
+      $pseudoRules = [];
 
-      foreach ($properties as $propertie => $propValue) {
-        if(gettype($propValue) == "array"){
-          
+      foreach ($declarations as $propertie => $value) {
+        //if the value is an array, then it is an nested propertie or a pseudo-class/element
+        if(gettype($value) == "array"){
           $mod = substr($propertie, 0, 1);
           $propName = substr($propertie, 1);
 
           if($mod == "&"){ //Pseudo-classes
-            array_push($pseudoClasses, [
+            array_push($pseudoRules, [
               "selector" => $selector.":".$propName, 
-              "properties" => $propValue
+              "declarations" => $value
             ]);
           } else if($mod == "%"){ //Nested properties
-            foreach ($propValue as $propValueKey => $propValueVal) {
-              $properties[$propName."-".$propValueKey] = $propValueVal;
+            foreach ($value as $valueKey => $valueVal) {
+              $declarations[$propName."-".$valueKey] = $valueVal;
             }
           }
 
-          unset($properties[$propertie]);
+          unset($declarations[$propertie]);
         }
       }
 
-      $selectorObj = new Cshp_Selector();
-      $selectorObj->mainSelector = $selector;
-      $selectorObj->properties = $properties;
+      $ruleset = new Cshp_Ruleset();
+      $ruleset->selector = $selector;
+      $ruleset->declarations = $declarations;
 
-      $selectorSnippets = array_intersect($properties, array_flip($this->snippets));
+      //Search for snippets in the current ruleset
+      $rulesetSnippets = array_intersect($declarations, array_flip($this->snippets));
       
-      foreach ($selectorSnippets as $selectorSnippetKey => $selectorSnippetValue) {
-        $newPropertie = explode(":", $this->snippets[$selectorSnippetValue]);
-        $selectorObj->properties[$selectorSnippetKey] = $newPropertie[1];
-        $selectorObj->properties[$newPropertie[0]] = $selectorObj->properties[$selectorSnippetKey];
-        unset($selectorObj->properties[$selectorSnippetKey]);
+      foreach ($rulesetSnippets as $snippetKey => $snippetValue) {
+        $newDeclaration = explode(":", $this->snippets[$snippetValue]);
+        $ruleset->declarations[$snippetKey] = $newDeclaration[1];
+        $ruleset->declarations[$newDeclaration[0]] = $ruleset->declarations[$snippetKey];
+        unset($ruleset->declarations[$snippetKey]);
       }
 
-      $this->outputObject->addSelector($selectorObj);
+      //Add the main ruleset
+      $this->outputObject->addRuleset($ruleset);
 
-      foreach ($pseudoClasses as $pseudoSelector) {
-        $this->select($pseudoSelector["selector"], $pseudoSelector["properties"]);
+      //Add the pseudo rulesets after the main
+      foreach ($pseudoRules as $pseudoRule) {
+        $this->rule($pseudoRule["selector"], $pseudoRule["declarations"]);
       }
 
     } catch (Exception $error) {
@@ -121,9 +128,12 @@ class Cshp {
   }
 
   public function compile($outputFolder = "", $outputFile = ""){
-    if($outputFile == ""){
+    if($outputFolder == ""){
       header("Content-type: text/css");
       echo $this->outputObject->compile($this->compress);
+    } else {
+      //If name was not given generates a random filename
+      $fileName = $outputFile != "" ? $outputFile : uniqid(rand(), true) . '.css';
     }
   }
 

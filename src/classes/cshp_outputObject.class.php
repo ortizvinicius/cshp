@@ -1,6 +1,6 @@
 <?php 
 
-require_once("cshp_Selector.class.php");
+require_once("cshp_Ruleset.class.php");
 
 class Cshp_OutputObject {
 
@@ -24,16 +24,17 @@ class Cshp_OutputObject {
     array_unshift($this->indexArray, "?");
   }
 
-  public function addSelector(Cshp_Selector $selector){
+  public function addRuleset(Cshp_Ruleset $ruleset){
 
-    $existentIndex = array_search($selector->mainSelector, $this->indexArray);
+    //Test if the selector was already set
+    $existentIndex = array_search($ruleset->selector, $this->indexArray);
 
     if($existentIndex === false){
-      array_push($this->outputArray, $selector);
-      array_push($this->indexArray, $selector->mainSelector);
+      array_push($this->outputArray, $ruleset);
+      array_push($this->indexArray, $ruleset->selector);
     } else {
-      //Add the new properties
-      $this->outputArray[$existentIndex]->properties = array_merge($this->outputArray[$existentIndex]->properties, $selector->properties);
+      //Add the new declarations
+      $this->outputArray[$existentIndex]->declarations = array_merge($this->outputArray[$existentIndex]->declarations, $ruleset->declarations);
     }
 
   }
@@ -47,20 +48,20 @@ class Cshp_OutputObject {
 
     $lastString = false;
 
-    foreach ($this->outputArray as $selector) {
-      if(gettype($selector) == "object"){
+    foreach ($this->outputArray as $ruleset) {
+      if(gettype($ruleset) == "object"){
         if($lastString){ $outputCSS .= $lineBreak; }
         
-        $outputCSS .= $selector->mainSelector . $space . "{" . $lineBreak;
-        foreach ($selector->properties as $propKey => $propValue) {
-          $outputCSS .= $ident.$propKey . ':' . $space . $propValue . ";" . $lineBreak;
+        $outputCSS .= $ruleset->selector . $space . "{" . $lineBreak;
+        foreach ($ruleset->declarations as $propertie => $value) {
+          $outputCSS .= $ident.$propertie . ':' . $space . $value . ";" . $lineBreak;
         }
         $outputCSS .= "}".$lineBreak;
         
         $lastString = false;
       } else {
         if(!$lastString){ $outputCSS .= $lineBreak; }
-        $outputCSS .= $selector.$lineBreak;
+        $outputCSS .= $ruleset.$lineBreak;
         $lastString = true;
       }
     }
