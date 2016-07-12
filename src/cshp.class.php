@@ -77,6 +77,7 @@ class Cshp {
     try {
       
       $pseudoRules = [];
+      $nestedElements = [];
 
       foreach ($declarations as $propertie => $value) {
         //if the value is an array, then it is an nested propertie or a pseudo-class/element
@@ -93,6 +94,11 @@ class Cshp {
             foreach ($value as $valueKey => $valueVal) {
               $declarations[$propName."-".$valueKey] = $valueVal;
             }
+          } else { //Nested element
+            array_push($nestedElements, [
+              "selector" => $selector." ".$propertie, 
+              "declarations" => $value
+            ]);
           }
 
           unset($declarations[$propertie]);
@@ -119,6 +125,11 @@ class Cshp {
       //Add the pseudo rulesets after the main
       foreach ($pseudoRules as $pseudoRule) {
         $this->rule($pseudoRule["selector"], $pseudoRule["declarations"]);
+      }
+
+      //Add the nested elements after the main
+      foreach ($nestedElements as $nested) {
+        $this->rule($nested["selector"], $nested["declarations"]);
       }
 
     } catch (Exception $error) {
