@@ -127,13 +127,31 @@ class Cshp {
   
   }
 
-  public function compile($outputFolder = "", $outputFile = ""){
+  public function compile($outputFolder = "", $outputFile = ""){ //if folder an file are given, then will save relative to where compile was called
+
+    $outputCSS = $this->outputObject->compile($this->compress);
+
     if($outputFolder == ""){
       header("Content-type: text/css");
-      echo $this->outputObject->compile($this->compress);
+      echo $outputCSS;
     } else {
       //If name was not given generates a random filename
-      $fileName = $outputFile != "" ? $outputFile : uniqid(rand(), true) . '.css';
+      try {
+        $fileName = $outputFile != "" ? $outputFile : number_format(uniqid(rand(), true), 0, "", "") . '.css';
+
+        $file = fopen($outputFolder . "/" . $fileName, "w");
+        fwrite($file, $outputCSS);
+        fclose($file);
+
+        if($outputFile == ""){
+          return $fileName;
+        } else {
+          return true;
+        }
+
+      } catch (Exception $e){
+        return $e;
+      }
     }
   }
 

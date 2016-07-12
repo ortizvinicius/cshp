@@ -46,23 +46,15 @@ class Cshp_OutputObject {
     $space = !$compress ? " " : "";
     $ident = !$compress ? "  " : "";
 
-    $lastString = false;
-
     foreach ($this->outputArray as $ruleset) {
       if(gettype($ruleset) == "object"){
-        if($lastString){ $outputCSS .= $lineBreak; }
-        
         $outputCSS .= $ruleset->selector . $space . "{" . $lineBreak;
         foreach ($ruleset->declarations as $propertie => $value) {
           $outputCSS .= $ident.$propertie . ':' . $space . $value . ";" . $lineBreak;
         }
         $outputCSS .= "}".$lineBreak;
-        
-        $lastString = false;
       } else {
-        if(!$lastString){ $outputCSS .= $lineBreak; }
         $outputCSS .= $ruleset.$lineBreak;
-        $lastString = true;
       }
     }
 

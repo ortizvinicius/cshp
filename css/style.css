@@ -1,0 +1,29 @@
+
+@import 'print.css' print, projection; 
+/* CSHP test page */ 
+
+body {
+  color: #FFF;
+  background-color: #000;
+  border: none;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  height: 100%;
+}
+a {
+  font-family: Helvetica;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+}
+a:hover {
+  color: green;
+  text-decoration: underline;
+}
+a:hover:after {
+  background: #FFF;
+  display: block;
+  border-radius: 10px;
+  content: 'Click';
+  margin-top: 10px;
+  position: absolute;
+}
