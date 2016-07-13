@@ -12,6 +12,9 @@ class Cshp {
   //Data
   private $snippets;
 
+  //Functions
+  private $mixins;
+
   //The final CSS
   private $outputObject;
 
@@ -19,6 +22,7 @@ class Cshp {
     
     $this->outputObject = new Cshp_OutputObject();
     $this->cshpFolder = is_array($options) ? $cshpFolder : $options; //If an array was not given in options, so it is the folder name
+    $this->mixins = [];
 
     try { 
       $this->compress = in_array("compress", $options) || in_array("compressed", $options); //True = compress, False = normal  
@@ -81,7 +85,8 @@ class Cshp {
 
       foreach ($declarations as $propertie => $value) {
         //if the value is an array, then it is an nested propertie or a pseudo-class/element
-        if(gettype($value) == "array"){
+        
+        if(gettype($value) == "array" || $mod == "@"){
           $mod = substr($propertie, 0, 1);
           $propName = substr($propertie, 1);
 
@@ -103,6 +108,38 @@ class Cshp {
 
           unset($declarations[$propertie]);
         }
+      }
+
+      foreach ($functions as $function => $parameters) {
+
+        if(gettype($parameters) == "array"){ //function with parameter
+          $mod = substr($function, 0, 1);
+          $funcName = substr($function, 1);
+
+          if($mod == "@"){ //Mixin
+            
+            $mixinDeclaration = array();
+
+            foreach ($this->mixins[$funcName][1] as $mixinDeclarationProperty => $mixinDeclarationValue) {
+              $newMixinDeclaration = $mixinDeclarationValue;
+              foreach ($this->mixins[$funcName][0] as $mixinParameterIndex => $mixinParameter) {
+                $newMixinDeclaration = str_replace("{{" . $mixinParameter . "}}", $parameters[$mixinParameterIndex], $newMixinDeclaration);
+              }
+              $mixinDeclaration["$mixinDeclarationProperty"] = $newMixinDeclaration;
+            }
+
+            $declarations = array_merge($declarations, $mixinDeclaration);
+
+          }
+        } else { //function without parameter
+          $mod = substr($parameters, 0, 1);
+          $funcName = substr($parameters, 1);
+
+          if($mod == "@"){ //Extend
+            $declarations = array_merge($declarations, $this->mixins[$funcName][0]);
+          }
+        }
+
       }
 
       $ruleset = new Cshp_Ruleset();
@@ -138,16 +175,29 @@ class Cshp {
   
   }
 
+  public function mixin($mixinName, $parameters, $declaration = []){
+    try {
+      
+      //assign the new mixin
+      $this->mixins[$mixinName][0] = $parameters;
+      $this->mixins[$mixinName][1] = $declaration;
+
+    } catch (Exception $e){
+      return $e;
+    }
+  }
+
   public function compile($outputFolder = "", $outputFile = ""){ //if folder an file are given, then will save relative to where compile was called
 
-    $outputCSS = $this->outputObject->compile($this->compress);
+    try {
 
-    if($outputFolder == ""){
-      header("Content-type: text/css");
-      echo $outputCSS;
-    } else {
-      //If name was not given generates a random filename
-      try {
+      $outputCSS = $this->outputObject->compile($this->compress);
+
+      if($outputFolder == ""){
+        header("Content-type: text/css");
+        echo $outputCSS;
+      } else {
+        //If name was not given generates a random filename
         $fileName = $outputFile != "" ? $outputFile : number_format(uniqid(rand(), true), 0, "", "") . '.css';
 
         $file = fopen($outputFolder . "/" . $fileName, "w");
@@ -159,10 +209,9 @@ class Cshp {
         } else {
           return true;
         }
-
-      } catch (Exception $e){
-        return $e;
       }
+    } catch (Exception $e){
+      return $e;
     }
   }
 
