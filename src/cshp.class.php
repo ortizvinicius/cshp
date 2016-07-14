@@ -18,7 +18,7 @@ class Cshp {
   //The final CSS
   private $outputObject;
 
-  function __construct($options = [], $cshpFolder = "src"){
+  function __construct($options = [], $cshpFolder = "cshp"){
     
     $this->outputObject = new Cshp_OutputObject();
     $this->cshpFolder = is_array($options) ? $cshpFolder : $options; //If an array was not given in options, so it is the folder name
@@ -41,7 +41,7 @@ class Cshp {
     $this->comment("error", $errorMessage);
   }
 
-  public function comment($type = "info", $message = "Ops! We forget the message"){ //CSS comment
+  public function comment($type = "info", $message = ""){ //CSS comment
     $commentString = "";
     
     if($type == "info"){
@@ -50,6 +50,8 @@ class Cshp {
       $commentString  = "########## ERROR ##########\n";
       $commentString .= "/* " . $message . " \n";
       $commentString .= "--- Compilation stopped */ ";
+    } else {
+      $commentString = "/* " . $type . " */ ";
     }
 
     $this->outputObject->addString($commentString);
@@ -77,7 +79,7 @@ class Cshp {
     }
   }
 
-  public function rule($selector, $declarations = [], $functions = []){ //CSS declaration
+  public function rule($selector, $declarations = []){ //CSS declaration
     try {
       
       $pseudoRules = [];
@@ -86,7 +88,9 @@ class Cshp {
       foreach ($declarations as $propertie => $value) {
         //if the value is an array, then it is an nested propertie or a pseudo-class/element
         
-        if(gettype($value) == "array" || $mod == "@"){
+        $modValue = substr($value, 0, 1);
+
+        if(gettype($value) == "array" || $modValue == "@"){
           $mod = substr($propertie, 0, 1);
           $propName = substr($propertie, 1);
 
@@ -99,6 +103,23 @@ class Cshp {
             foreach ($value as $valueKey => $valueVal) {
               $declarations[$propName."-".$valueKey] = $valueVal;
             }
+          } else if($mod == "@"){ //Mixin
+            
+            $mixinDeclaration = array();
+
+            foreach ($this->mixins[$propName][1] as $mixinDeclarationProperty => $mixinDeclarationValue) {
+              $newMixinDeclaration = $mixinDeclarationValue;
+              foreach ($this->mixins[$propName][0] as $mixinParameterIndex => $mixinParameter) {
+                $newMixinDeclaration = str_replace("{{" . $mixinParameter . "}}", $value[$mixinParameterIndex], $newMixinDeclaration);
+              }
+              $mixinDeclaration["$mixinDeclarationProperty"] = $newMixinDeclaration;
+            }
+
+            $declarations = array_merge($declarations, $mixinDeclaration);
+
+          } else if($modValue == "@"){ //Extend
+            $extendName = substr($value, 1);
+            $declarations = array_merge($declarations, $this->mixins[$extendName][0]);
           } else { //Nested element
             array_push($nestedElements, [
               "selector" => $selector." ".$propertie, 
@@ -108,38 +129,6 @@ class Cshp {
 
           unset($declarations[$propertie]);
         }
-      }
-
-      foreach ($functions as $function => $parameters) {
-
-        if(gettype($parameters) == "array"){ //function with parameter
-          $mod = substr($function, 0, 1);
-          $funcName = substr($function, 1);
-
-          if($mod == "@"){ //Mixin
-            
-            $mixinDeclaration = array();
-
-            foreach ($this->mixins[$funcName][1] as $mixinDeclarationProperty => $mixinDeclarationValue) {
-              $newMixinDeclaration = $mixinDeclarationValue;
-              foreach ($this->mixins[$funcName][0] as $mixinParameterIndex => $mixinParameter) {
-                $newMixinDeclaration = str_replace("{{" . $mixinParameter . "}}", $parameters[$mixinParameterIndex], $newMixinDeclaration);
-              }
-              $mixinDeclaration["$mixinDeclarationProperty"] = $newMixinDeclaration;
-            }
-
-            $declarations = array_merge($declarations, $mixinDeclaration);
-
-          }
-        } else { //function without parameter
-          $mod = substr($parameters, 0, 1);
-          $funcName = substr($parameters, 1);
-
-          if($mod == "@"){ //Extend
-            $declarations = array_merge($declarations, $this->mixins[$funcName][0]);
-          }
-        }
-
       }
 
       $ruleset = new Cshp_Ruleset();
