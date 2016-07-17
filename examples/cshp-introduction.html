@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSHP</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style/main.php">
+</head>
+<body>
+
+  <header role="banner">
+    <div class="banner">
+      <h1 class="logo"><span>meet</span> CSHP</h1>
+
+      <nav class="bannerNav" role="navigation">
+        <ul>
+          <li><a href="http://github.com/ortizvinicius/cshp">GitHub</a></li>
+          <li><a href="docs.html">Docs</a></li>
+        </ul>
+      </nav>
+    </div>
+    
+    <div class="tooltip">A CSS preprocessor written in PHP with features inspired by <a href="http://sass-lang.com" class="externalLink" target="_blank">SASS</a> and some <a href="https://github.com/emmetio/emmet/blob/master/lib/snippets.json" class="externalLink" target="_blank">Emmet snippets</a></div>
+
+  </header>
+
+  <main role="main">
+    
+    <article role="article">
+      
+      <h2>What you can do with CSHP?</h2>
+
+      <div class="box">
+        <h3>Nest elements</h3>
+
+        <p>PHP:</p>
+        <code class="phpCode">
+          <pre>
+$cshp->rule("ul", [ 
+  "list-style-type" => "none",
+  "li" => [
+    "border-bottom": "1px solid #CCC"
+  ]
+]);
+          </pre>
+        </code>
+
+        <p>CSS:</p>
+        <code class="cssCode">
+          <pre>
+ul {
+  list-style-type: none,
+}
+  ul li {
+    border-bottom: 1px solid #CCC;
+  }
+          </pre>
+        </code>
+      </div>
+
+      <div class="box">
+        <h3>Nest properties</h3>
+        
+        <p>PHP:</p>
+        <code class="phpCode">
+          <pre>
+$cshp->rule("body", [ 
+  "color" => "#333",
+  "%font" => [
+    "family" => "Helvetica, Arial, sans-serif",
+    "size" => "16px",
+    "weight" => "bold"
+  ]
+]);
+          </pre>
+        </code>
+
+        <p>CSS:</p>
+        <code class="cssCode">
+          <pre>
+body {
+  color: #333;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+          </pre>
+        </code>
+      </div>      
+
+      <div class="box">
+        <h3>Nest pseudo-classes</h3>
+        
+        <p>PHP:</p>
+        <code class="phpCode">
+          <pre>
+$cshp->rule("a", [ 
+  "td:n",
+  "&amp;hover" => [
+    "td:u",
+    "color" => "green"
+  ]
+]);
+          </pre>
+        </code>
+
+        <p>CSS:</p>
+        <code class="cssCode">
+          <pre>
+a {
+  text-decoration: none;
+}
+  a:hover {
+    text-decoration: underline;
+    color: green;
+  }
+          </pre>
+        </code>
+      </div> 
+
+      <div class="box">
+        <h3>Emmet Snippets</h3>
+        
+        <p>PHP:</p>
+        <code class="phpCode">
+          <pre>
+$cshp->rule("a", ["td:n", "fw:b, "ff:a"]);
+          </pre>
+        </code>
+
+        <p>CSS:</p>
+        <code class="cssCode">
+          <pre>
+a {
+  text-decoration: none;
+  font-weight: bold;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+          </pre>
+        </code>
+      </div>  
+
+      <div class="box">
+        <h3>Mixins</h3>
+        
+        <p>PHP:</p>
+        <code class="phpCode">
+          <pre>
+$cshp->mixin("bdRadius", ["radius"], [
+    "border-radius" => "{{radius}}"
+  ]
+);
+$cshp->rule(".box", [
+  "width" => "300px",
+  "@bdRadius" => ["15px"]
+]);
+          </pre>
+        </code>
+
+        <p>CSS:</p>
+        <code class="cssCode">
+          <pre>
+.box {
+  width: 300px;
+  border-radius: 15px;
+}
+          </pre>
+        </code>
+      </div>  
+
+      <div class="box">
+        <h3>Extends</h3>
+        
+        <p>PHP:</p>
+        <code class="phpCode">
+          <pre>
+$cshp->mixin("center", [
+    "margin" => "0 auto"
+  ]
+);
+$cshp->rule(".mainContent", [
+  "width" => "960px",
+  "@center"
+]);
+          </pre>
+        </code>
+
+        <p>CSS:</p>
+        <code class="cssCode">
+          <pre>
+.mainContent {
+  width: 960px;
+  margin: 0 auto;
+}
+          </pre>
+        </code>
+      </div>
+
+      <p>And of course use the PHP features in yout advantage (database integration maybe?)</p>
+
+      <h3>The compilation</h3>
+      <p>You can compile your CSS code in two ways:</p>
+
+      <h4>Direct in the PHP script</h4>
+      <code class="phpCode">$cshp->compile();</code>
+      <p>And call the PHP file in the link tag:</p>
+      <code class="htmlCode">&ltlink rel="stylesheet" href="style/main.php"&gt</code>
+      <p>This ways you can use more dynamical data in the back-end.</p>
+
+      <h4>Or compile a CSS file</h4>
+      <code class="phpCode">$cshp->compile("folder", "fileName.css");</code>
+      <p>Providing a folder and a file name (optional) the output CSS will be in a common CSS file</p>
+
+      <h4>Minify</h4>
+      <p>When you instance the CSHP object you can include the "compress" option, so the output CSS will be compressed:</p>
+      <code class="phpCode">$cshp = new Cshp(["compress, snippets"]);</code>
+
+    </article>
+
+  </main>
+
+  <footer role="contentinfo">
+      <p class="versionInfo">Current version: <strong>0.1.0.pre-alpha</strong></p>
+      <p>Under MIT license</p>
+      <nav class="footerNav" role="navigation">
+        <ul>
+          <li><a href="http://github.com/ortizvinicius/cshp">Fork on GitHub</a></li>
+          <li><a href="docs.html">See the docs</a></li>
+        </ul>
+      </nav>
+  </footer>
+
+</body>
+</html>
