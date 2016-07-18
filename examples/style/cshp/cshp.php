@@ -32,7 +32,7 @@ class Cshp {
       $this->compress = in_array("compress", $options) || in_array("compressed", $options); //True = compress, False = normal  
       if(in_array("snippets", $options)){ 
         $this->snippetClass = new Cshp_Snippet($this->cshpFolder);
-        $this->snippets = $this->snippetClass->getAll();
+        $this->snippets = $this->snippetClass->snippets;
       } else {
         $this->snippets = array();
       }
