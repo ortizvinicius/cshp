@@ -26,7 +26,7 @@
 
   <main role="main">
     
-    <article role="article">
+    <article class="article" role="article">
       
       <h2>What you can do with CSHP?</h2>
 
@@ -35,26 +35,22 @@
 
         <p>PHP:</p>
         <code class="phpCode">
-          <pre>
-$cshp->rule("ul", [ 
+          <pre>$cshp->rule("ul", [ 
   "list-style-type" => "none",
   "li" => [
     "border-bottom": "1px solid #CCC"
   ]
-]);
-          </pre>
+]);</pre>
         </code>
 
         <p>CSS:</p>
         <code class="cssCode">
-          <pre>
-ul {
+          <pre>ul {
   list-style-type: none,
 }
   ul li {
     border-bottom: 1px solid #CCC;
-  }
-          </pre>
+  }</pre>
         </code>
       </div>
 
@@ -63,28 +59,22 @@ ul {
         
         <p>PHP:</p>
         <code class="phpCode">
-          <pre>
-$cshp->rule("body", [ 
+          <pre>$cshp->rule("body", [ 
   "color" => "#333",
   "%font" => [
     "family" => "Helvetica, Arial, sans-serif",
-    "size" => "16px",
-    "weight" => "bold"
+    "size" => "16px"
   ]
-]);
-          </pre>
+]);</pre>
         </code>
 
         <p>CSS:</p>
         <code class="cssCode">
-          <pre>
-body {
+          <pre>body {
   color: #333;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 16px;
-  font-weight: bold;
-}
-          </pre>
+}</pre>
         </code>
       </div>      
 
@@ -93,28 +83,20 @@ body {
         
         <p>PHP:</p>
         <code class="phpCode">
-          <pre>
-$cshp->rule("a", [ 
+          <pre>$cshp->rule("a", [ 
   "td:n",
-  "&amp;hover" => [
-    "td:u",
-    "color" => "green"
-  ]
-]);
-          </pre>
+  "&amp;hover" => [ "color" => "green" ]
+]);</pre>
         </code>
 
         <p>CSS:</p>
         <code class="cssCode">
-          <pre>
-a {
+          <pre>a {
   text-decoration: none;
 }
   a:hover {
-    text-decoration: underline;
     color: green;
-  }
-          </pre>
+  }</pre>
         </code>
       </div> 
 
@@ -123,20 +105,20 @@ a {
         
         <p>PHP:</p>
         <code class="phpCode">
-          <pre>
-$cshp->rule("a", ["td:n", "fw:b, "ff:a"]);
-          </pre>
+          <pre>$cshp->rule("a", [
+  "td:n", 
+  "fw:b, 
+  "ff:a"
+]);</pre>
         </code>
 
         <p>CSS:</p>
         <code class="cssCode">
-          <pre>
-a {
+          <pre>a {
   text-decoration: none;
   font-weight: bold;
-  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-}
-          </pre>
+  font-family: Arial, Helvetica, sans-serif;
+}</pre>
         </code>
       </div>  
 
@@ -145,26 +127,22 @@ a {
         
         <p>PHP:</p>
         <code class="phpCode">
-          <pre>
-$cshp->mixin("bdRadius", ["radius"], [
+          <pre>$cshp->mixin("bdRadius", ["radius"], [
     "border-radius" => "{{radius}}"
   ]
 );
 $cshp->rule(".box", [
   "width" => "300px",
   "@bdRadius" => ["15px"]
-]);
-          </pre>
+]);</pre>
         </code>
 
         <p>CSS:</p>
         <code class="cssCode">
-          <pre>
-.box {
+          <pre>.box {
   width: 300px;
   border-radius: 15px;
-}
-          </pre>
+}</pre>
         </code>
       </div>  
 
@@ -173,30 +151,29 @@ $cshp->rule(".box", [
         
         <p>PHP:</p>
         <code class="phpCode">
-          <pre>
-$cshp->mixin("center", [
+          <pre>$cshp->mixin("center", [
     "margin" => "0 auto"
   ]
 );
 $cshp->rule(".mainContent", [
   "width" => "960px",
   "@center"
-]);
-          </pre>
+]);</pre>
         </code>
 
         <p>CSS:</p>
         <code class="cssCode">
-          <pre>
-.mainContent {
+          <pre>.mainContent {
   width: 960px;
   margin: 0 auto;
-}
-          </pre>
+}</pre>
         </code>
       </div>
+      <div class="clear"></div>
 
       <p>And of course use the PHP features in yout advantage (database integration maybe?)</p>
+
+      <hr>
 
       <h3>The compilation</h3>
       <p>You can compile your CSS code in two ways:</p>
@@ -204,7 +181,7 @@ $cshp->rule(".mainContent", [
       <h4>Direct in the PHP script</h4>
       <code class="phpCode">$cshp->compile();</code>
       <p>And call the PHP file in the link tag:</p>
-      <code class="htmlCode">&ltlink rel="stylesheet" href="style/main.php"&gt</code>
+      <code class="phpCode">&ltlink rel="stylesheet" href="style/main.php"&gt</code>
       <p>This ways you can use more dynamical data in the back-end.</p>
 
       <h4>Or compile a CSS file</h4>
@@ -219,9 +196,8 @@ $cshp->rule(".mainContent", [
 
   </main>
 
-  <footer role="contentinfo">
-      <p class="versionInfo">Current version: <strong>0.1.0.pre-alpha</strong></p>
-      <p>Under MIT license</p>
+  <footer class="mainFooter" role="contentinfo">
+      <p class="versionInfo">Current version: <strong>0.1.0.pre-alpha</strong> - Under MIT license</p>
       <nav class="footerNav" role="navigation">
         <ul>
           <li><a href="http://github.com/ortizvinicius/cshp">Fork on GitHub</a></li>

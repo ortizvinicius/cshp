@@ -1,6 +1,6 @@
 <?php 
 
-require_once("cshp_Ruleset.class.php");
+require_once("model/cshp_Ruleset.php");
 
 class Cshp_OutputObject {
 

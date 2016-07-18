@@ -1,7 +1,8 @@
 <?php 
 
-require_once("classes/cshp_OutputObject.class.php");
-require_once("classes/cshp_Ruleset.class.php");
+require_once("lib/cshp_OutputObject.php");
+require_once("lib/model/cshp_Ruleset.php");
+require_once("lib/model/cshp_Snippet.php");
 
 class Cshp {
 
@@ -18,6 +19,9 @@ class Cshp {
   //The final CSS
   private $outputObject;
 
+  //Data
+  private $snippetClass;
+
   function __construct($options = [], $cshpFolder = "cshp"){
     
     $this->outputObject = new Cshp_OutputObject();
@@ -26,7 +30,12 @@ class Cshp {
 
     try { 
       $this->compress = in_array("compress", $options) || in_array("compressed", $options); //True = compress, False = normal  
-      $this->snippets = in_array("snippets", $options) ? json_decode(file_get_contents($this->cshpFolder."/data/cshp_snippets.json"), true) : array();
+      if(in_array("snippets", $options)){ 
+        $this->snippetClass = new Cshp_Snippet($this->cshpFolder);
+        $this->snippets = $this->snippetClass->getAll();
+      } else {
+        $this->snippets = array();
+      }
     } catch (Exception $error){
       $this->throwError($error->getMessage());
     }
@@ -88,7 +97,7 @@ class Cshp {
       foreach ($declarations as $propertie => $value) {
         //if the value is an array, then it is an nested propertie or a pseudo-class/element
         
-        $modValue = substr($value, 0, 1);
+        $modValue = gettype($value) == "string" ? substr($value, 0, 1) : "";
 
         if(gettype($value) == "array" || $modValue == "@"){
           $mod = substr($propertie, 0, 1);
