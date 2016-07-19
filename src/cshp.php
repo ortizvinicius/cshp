@@ -12,15 +12,13 @@ class Cshp {
 
   //Data
   private $snippets;
+  private $snippet;
 
   //Functions
   private $mixins;
 
   //The final CSS
   private $outputObject;
-
-  //Data
-  private $snippetClass;
 
   function __construct($options = [], $cshpFolder = "cshp"){
     
@@ -31,8 +29,8 @@ class Cshp {
     try { 
       $this->compress = in_array("compress", $options) || in_array("compressed", $options); //True = compress, False = normal  
       if(in_array("snippets", $options)){ 
-        $this->snippetClass = new Cshp_Snippet($this->cshpFolder);
-        $this->snippets = $this->snippetClass->snippets;
+        $this->snippet = new Cshp_Snippet($this->cshpFolder);
+        $this->snippets = $this->snippet->snippets;
       } else {
         $this->snippets = array();
       }
