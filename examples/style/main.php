@@ -1,6 +1,6 @@
 <?php 
 require_once("cshp/cshp.php");
-$cshp = new Cshp(["snippets"]);
+$cshp = new Cshp(["snippets", "compress"]);
 
 $cshp->import("normalize.css");
 $cshp->comment("info", "CSHP Introduction styles");
