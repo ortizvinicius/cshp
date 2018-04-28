@@ -1,9 +1,9 @@
-#CSHP
+# CSHP
 A CSS preprocessor written in PHP and interpreted on the server-side, with features inspired by SASS and some Emmet snippets
 
-##What you can do with CSHP?
+## What you can do with CSHP?
 
-###Nest elements
+### Nest elements
 PHP:
 ```
 $cshp->rule("ul", [ 
@@ -23,7 +23,7 @@ ul {
   }
 ```
 
-###Nest properties
+### Nest properties
 PHP:
 ```
 $cshp->rule("body", [ 
@@ -43,7 +43,7 @@ body {
 }
 ```
 
-###Nest pseudo-classes
+### Nest pseudo-classes
 PHP:
 ```
 $cshp->rule("a", [ 
@@ -61,7 +61,7 @@ a {
   }
 ```
 
-###Emmet snippets
+### Emmet snippets
 PHP:
 ```
 $cshp->rule("a", [
@@ -79,7 +79,7 @@ a {
 }
 ```
 
-###Mixins
+### Mixins
 PHP:
 ```
 $cshp->mixin("bdRadius", ["radius"], [
@@ -99,7 +99,7 @@ CSS:
 }
 ```
 
-###Extends
+### Extends
 PHP:
 ```
 $cshp->mixin("center", [
@@ -123,11 +123,11 @@ And of course use the PHP features in your advantage (database integration maybe
 
 -----
 
-###The compilation
+### The compilation
 
 You can compile your CSS code in two ways:
 
-####Direct in the PHP script
+#### Direct in the PHP script
 ```
 $cshp->compile();
 ```
@@ -137,13 +137,13 @@ And call the PHP file in the link tag:
 ```
 This way you can use more dynamical data in the back-end.
 
-####Or compile a CSS file
+#### Or compile a CSS file
 ```
 $cshp->compile("folder", "fileName.css");
 ```
 Providing a folder and a file name (optional) the output CSS will be in a common CSS file
 
-####Minify
+#### Minify
 When you instance the CSHP object you can include the "compress" option, so the output CSS will be compressed:
 ```
 $cshp = new Cshp(["compress, snippets"]);
